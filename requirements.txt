@@ -1,7 +1,4 @@
 pandas
 numpy
-sciket-learn
 joblib
-matplotlib
-seaborn
 streamlit
