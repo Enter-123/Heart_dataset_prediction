@@ -4,4 +4,3 @@ joblib
 streamlit
 scikit-learn
 altair==4.2.2
-imghdr
