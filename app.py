@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 
 # Load the trained model
-with open('model.pkl', 'rb') as model_file:
+with open('knn_model.joblib', 'rb') as model_file:
     model = pickle.load(model_file)
 
 # Function for predictions
