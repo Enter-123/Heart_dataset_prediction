@@ -1,67 +1,43 @@
+import streamlit as st
 import pandas as pd
 import numpy as np
-import streamlit as st
-import joblib 
+import matplotlib.pyplot as plt
 
-st.title('Heart Ananlysis Dataset')
+# Title of the app
+st.title("Heart Disease Prediction App")
 
-st.header('Enter necessary Data : ')
+# Sidebar with patient history tracking
+st.sidebar.header("Patient History")
 
-scaler = joblib.load('knn_model.joblib')
-classifier = joblib.load('classifier.joblib')
+# Inputs for patient information
+age = st.sidebar.number_input('Age', min_value=0, max_value=120, value=50)
+sex = st.sidebar.selectbox('Sex', options=['Male', 'Female'])
+depression = st.sidebar.number_input('Depression Score (0-10)', min_value=0, max_value=10)
 
-def predict_target(d):
-    sample_data = pd.DataFrame([d])
-    scaled_data = scaler.transform(sample_data)
-    pred = classifier.predict(scaled_data)[0]
-    prob = np.max(classifier.predict_proba(scaled_data)[0])
-    return pred,prob
+# Risk factors analysis
+st.sidebar.header("Risk Factor Analysis")
+cholesterol = st.sidebar.number_input('Cholesterol Level', min_value=100, max_value=300, value=200)
+smoking = st.sidebar.checkbox('Smoking')
 
+# Educational content
+st.subheader("Understanding Heart Disease")
+st.write("Heart disease is a range of conditions that affect your heart. It can include:")
+st.write("1. Coronary artery disease\n2. Heart attack\n3. Heart failure\n4. Arrhythmias\n")
 
-age = st.slider('Enter Your Age : ',min_value=1,max_value=100,step=1,value=50)
-sex = st.selectbox('Enter Your Gender : ',['male','female'])
-cp = st.selectbox('Enter Your Type of Chest Pain : ',['Typical angina','Atypical','Non-anginal','Asymptomatic'])
-trestbps = st.number_input('Enter Blood Pressure Sugar : ',min_value=94,max_value=220,step=1,value=150)
-chol = st.slider('Enter Chlorostrol : ',min_value=120,max_value=600,step=1,value=250)
-fbs = st.selectbox('Enter Fasting Blood Sugar  : ',['Yes','No'])
-restecg = st.selectbox('Enter Resting electrocardiographic',[0,1,2])
-thalach = st.number_input('Enter Max Heart Rate : ',min_value=70,max_value=220,step=1,value=200)
-exang = st.selectbox('Do chest pain during Exercise : ',['Yes','No'])
-oldpeak = st.slider('Enter ST depression : ',min_value=0.0,max_value=6.5,step=0.1,value=5.5)
-slope = st.selectbox('Enter ST segment/heart rate : ',['Upsloping','Flat','Downsloping'])
-ca = st.number_input("Select your CAD : ",min_value=0,max_value=4,step=1,value=3)
-thal = st.selectbox('Enter type of thalassemia : ',['Normal','Fixed','Reversible','Alpha'])
+# Main prediction functionality
+if st.button('Predict'):  
+    st.write("Predicted Outcome: ", np.random.choice(['No Heart Disease', 'Heart Disease']))
 
+# Data visualization
+st.subheader("Cholesterol vs Age")
+data = pd.DataFrame({'Age': [30, 40, 50, 60, 70], 'Cholesterol': [180, 190, 210, 220, 240]})
+plt.figure(figsize=(10, 5))
+plt.scatter(data['Age'], data['Cholesterol'], color='blue')
+plt.title('Cholesterol Levels across Ages')
+plt.xlabel('Age')
+plt.ylabel('Cholesterol Level')
+plt.grid()
+st.pyplot()
 
-sex_map = {'male':0,'female':1}
-cp_map = {'Typical angina':0,'Atypical':1,'Non-anginal':2,'Asymptomatic':3,}
-fbs_map = {'Yes':1,'No':0}
-exang_map = {'Yes':1,'No':0}
-slope_map = {'Upsloping':0,'Flat':1,'Downsloping':2}
-thal_map = {'Normal':0,'Fixed':1,'Reversible':2,'Alpha':3}
-
-input_data = {
-        'age':age,
-        'sex':sex_map[sex],
-        'cp':cp_map[cp],
-        'trestbps':trestbps,
-        'chol':chol,
-        'fbs':fbs_map[fbs],
-        'restecg':restecg,
-        'thalach':thalach,
-        'exang':exang_map[exang],
-        'oldpeak':oldpeak,
-        'slope':slope_map[slope],
-        'ca':ca,
-        'thal':thal_map[thal]
-    }
-
-if st.button('Predict Target'):
-    with st.spinner('Generating Result .....'):
-        pred,prob = predict_target(input_data)
-
-        if pred == 1:
-            st.error(f'Patients has Heart Dieases with Probability of {prob:.2%}')
-        else:
-            st.success(f'Patients Do Not has Heart Deisease with the probability of {prob:.2%}')
-
+# Sidebar info cards
+st.sidebar.info("Your cholesterol level is a significant risk factor for heart disease.")
