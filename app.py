@@ -1,43 +1,52 @@
 import streamlit as st
 import pandas as pd
-import numpy as np
+import pickle
 import matplotlib.pyplot as plt
+import seaborn as sns
 
-# Title of the app
-st.title("Heart Disease Prediction App")
+# Load the trained model
+with open('model.pkl', 'rb') as model_file:
+    model = pickle.load(model_file)
 
-# Sidebar with patient history tracking
-st.sidebar.header("Patient History")
+# Function for predictions
+def predict(input_data):
+    result = model.predict([input_data])
+    return result
 
-# Inputs for patient information
-age = st.sidebar.number_input('Age', min_value=0, max_value=120, value=50)
-sex = st.sidebar.selectbox('Sex', options=['Male', 'Female'])
-depression = st.sidebar.number_input('Depression Score (0-10)', min_value=0, max_value=10)
+# UI configuration
+st.set_page_config(page_title='Heart Disease Prediction', layout='wide')
 
-# Risk factors analysis
-st.sidebar.header("Risk Factor Analysis")
-cholesterol = st.sidebar.number_input('Cholesterol Level', min_value=100, max_value=300, value=200)
-smoking = st.sidebar.checkbox('Smoking')
+# Creating Tabs
+tabs = st.tabs(['Prediction', 'Analytics', 'Education', 'About'])
 
-# Educational content
-st.subheader("Understanding Heart Disease")
-st.write("Heart disease is a range of conditions that affect your heart. It can include:")
-st.write("1. Coronary artery disease\n2. Heart attack\n3. Heart failure\n4. Arrhythmias\n")
+# Prediction Tab
+with tabs[0]:
+    st.header('Heart Disease Prediction')
+    age = st.number_input('Age:', min_value=0, max_value=120)
+    gender = st.selectbox('Gender:', ['Male', 'Female'])
+    cholesterol = st.selectbox('Cholesterol Level:', ['Normal', 'Above Normal'])
+    # Additional input fields here...  
+    input_data = [age, gender, cholesterol]  # Add more features as needed
+    if st.button('Predict'):
+        prediction = predict(input_data)
+        st.success(f'Prediction: {prediction[0]}')
 
-# Main prediction functionality
-if st.button('Predict'):  
-    st.write("Predicted Outcome: ", np.random.choice(['No Heart Disease', 'Heart Disease']))
+# Analytics Tab
+with tabs[1]:
+    st.header('Data Analytics')
+    data = pd.read_csv('heart_data.csv')  # Load your dataset
+    st.write(data.describe())
+    fig, ax = plt.subplots()
+    sns.countplot(data=data, x='target', ax=ax)
+    st.pyplot(fig)
 
-# Data visualization
-st.subheader("Cholesterol vs Age")
-data = pd.DataFrame({'Age': [30, 40, 50, 60, 70], 'Cholesterol': [180, 190, 210, 220, 240]})
-plt.figure(figsize=(10, 5))
-plt.scatter(data['Age'], data['Cholesterol'], color='blue')
-plt.title('Cholesterol Levels across Ages')
-plt.xlabel('Age')
-plt.ylabel('Cholesterol Level')
-plt.grid()
-st.pyplot()
+# Education Tab
+with tabs[2]:
+    st.header('Education')
+    st.write('Heart Disease Overview:')
+    st.write('Heart disease affects millions of people...')  # More content here
 
-# Sidebar info cards
-st.sidebar.info("Your cholesterol level is a significant risk factor for heart disease.")
+# About Tab
+with tabs[3]:
+    st.header('About this Application')
+    st.write('This application uses a trained model to predict heart disease...')  # Add details about the app
