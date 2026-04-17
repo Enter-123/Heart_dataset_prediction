@@ -1,12 +1,12 @@
 import streamlit as st
 import pandas as pd
-import pickle
+import joblib
 import matplotlib.pyplot as plt
 import seaborn as sns
 
 # Load the trained model
 with open('knn_model.joblib', 'rb') as model_file:
-    model = pickle.load(model_file)
+    model = joblib.load(model_file)
 
 # Function for predictions
 def predict(input_data):
